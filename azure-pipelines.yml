@@ -11,7 +11,7 @@ stages:
   jobs:
   - job: DockerBuildAndPush
     displayName: 'Docker Build and Push to ACR'
-    environment: 'production'
+   
 
     steps:
     - checkout: self
