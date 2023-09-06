@@ -1,0 +1,32 @@
+trigger:
+- none  # This pipeline won't be triggered automatically; you can manually trigger it
+
+pr: none  # Disable pull request triggering for this example
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+stages:
+- stage: BuildAndPush
+  jobs:
+  - job: DockerBuildAndPush
+    displayName: 'Docker Build and Push to ACR'
+    environment: 'production'
+
+    steps:
+    - checkout: self
+
+    - task: Docker@2
+      displayName: 'Docker Login'
+      inputs:
+        command: login
+        containerRegistry: $(REGISTRY_LOGIN_SERVER)
+        containerRegistryType: 'Container Registry'
+        dockerRegistryEndpoint: $(REGISTRY_USERNAME)
+        username: $(REGISTRY_USERNAME)
+        password: $(REGISTRY_PASSWORD)
+
+    - script: |
+        docker build -t tamopsgithubacr.azurecr.io/aspcoresample:$(Build.SourceVersion) -f aspnet-core-dotnet-core/Dockerfile .
+        docker push tamopsgithubacr.azurecr.io/aspcoresample:$(Build.SourceVersion)
+      displayName: 'Build and Push Docker Image'
